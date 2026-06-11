@@ -1,15 +1,19 @@
+const axios = require('axios');
+const { getHistory, saveHistory } = require('../utils/history');
+const { getListings } = require('./configgo');
+
 function buildSystemPrompt(listings) {
   const now = new Date();
-  const currentDateTime = now.toLocaleString('en-US', { 
+  const currentDateTime = now.toLocaleString('en-US', {
     timeZone: 'America/New_York',
     weekday: 'long',
     year: 'numeric',
-    month: 'long', 
+    month: 'long',
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit'
   });
-  
+
   const tomorrow = new Date(now);
   tomorrow.setDate(tomorrow.getDate() + 1);
   const dayAfter = new Date(now);
@@ -90,3 +94,42 @@ If you detect frustration, legal language, complaints, urgent requests, or somet
 CURRENT LISTINGS (use only this data):
 ${listingText}`;
 }
+
+async function getAIReply(userId, userMessage, channel) {
+  try {
+    const listings = await getListings();
+    const history = getHistory(userId);
+
+    history.push({ role: 'user', content: userMessage });
+
+    const response = await axios.post(
+      'https://api.anthropic.com/v1/messages',
+      {
+        model: 'claude-sonnet-4-5',
+        max_tokens: 300,
+        system: buildSystemPrompt(listings),
+        messages: history,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.ANTHROPIC_API_KEY,
+          'anthropic-version': '2023-06-01',
+        },
+      }
+    );
+
+    const reply = response.data.content[0].text;
+    history.push({ role: 'assistant', content: reply });
+    saveHistory(userId, history);
+
+    console.log(`[claude] Reply to ${userId}: ${reply}`);
+    return reply;
+
+  } catch (err) {
+    console.error('Claude API error:', err.response?.data || err.message);
+    return "Hi! Thanks for reaching out. Our team will be with you shortly.";
+  }
+}
+
+module.exports = { getAIReply };
