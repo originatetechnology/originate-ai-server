@@ -51,7 +51,7 @@ async function getAIReply(userId, userMessage, channel) {
     const response = await axios.post(
       'https://api.anthropic.com/v1/messages',
       {
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-5',
         max_tokens: 300,
         system: buildSystemPrompt(listings),
         messages: history,
