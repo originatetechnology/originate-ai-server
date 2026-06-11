@@ -1,3 +1,38 @@
+const { parsePhoneNumber } = require('libphonenumber-js');
+
+const TIMEZONE_MAP = {
+  'TR': { tz: 'Europe/Istanbul', name: 'Turkey Time (UTC+3)', locale: 'tr-TR' },
+  'US': { tz: 'America/New_York', name: 'Eastern Time (UTC-5)', locale: 'en-US' },
+  'CA': { tz: 'America/Toronto', name: 'Eastern Time (UTC-5)', locale: 'en-CA' },
+  'GB': { tz: 'Europe/London', name: 'UK Time (GMT)', locale: 'en-GB' },
+  'DE': { tz: 'Europe/Berlin', name: 'Central European Time (UTC+1)', locale: 'de-DE' },
+  'FR': { tz: 'Europe/Paris', name: 'Central European Time (UTC+1)', locale: 'fr-FR' },
+  'AE': { tz: 'Asia/Dubai', name: 'Gulf Time (UTC+4)', locale: 'en-AE' },
+  'SA': { tz: 'Asia/Riyadh', name: 'Arabia Time (UTC+3)', locale: 'ar-SA' },
+  'AU': { tz: 'Australia/Sydney', name: 'Australian Eastern Time (UTC+10)', locale: 'en-AU' },
+};
+
+function getTimezoneFromPhone(phoneNumber) {
+  try {
+    const parsed = parsePhoneNumber(phoneNumber);
+    const country = parsed?.country;
+    return TIMEZONE_MAP[country] || { tz: 'America/New_York', name: 'Eastern Time', locale: 'en-US' };
+  } catch {
+    return { tz: 'America/New_York', name: 'Eastern Time', locale: 'en-US' };
+  }
+}
+
+function formatDateInTz(date, tz, locale) {
+  return date.toLocaleString(locale, {
+    timeZone: tz,
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
 const axios = require('axios');
 const { getHistory, saveHistory } = require('../utils/history');
 const { getListings } = require('./configgo');
@@ -139,6 +174,23 @@ async function getAIReply(userId, userMessage, channel) {
     const listings = await getListings();
     const history = getHistory(userId);
 
+    // Detect timezone from phone number in conversation history
+    let userTz = null;
+    const allMessages = history.map(m => m.content).join(' ') + ' ' + userMessage;
+    const phoneMatch = allMessages.match(/\+\d{1,3}[\s\-]?\d{6,14}/);
+    if (phoneMatch) {
+      userTz = getTimezoneFromPhone(phoneMatch[0]);
+    }
+
+    // Detect from language if no phone yet
+    if (!userTz) {
+      const turkishChars = /[çğışöüÇĞİŞÖÜ]/;
+      const turkishWords = /\b(merhaba|teşekkür|evet|hayır|nasıl|nedir|fiyat|randevu|tamam|iyi)\b/i;
+      if (turkishChars.test(userMessage) || turkishWords.test(userMessage)) {
+        userTz = TIMEZONE_MAP['TR'];
+      }
+    }
+
     history.push({ role: 'user', content: userMessage });
 
     const response = await axios.post(
@@ -146,7 +198,7 @@ async function getAIReply(userId, userMessage, channel) {
       {
         model: 'claude-sonnet-4-5',
         max_tokens: 300,
-        system: buildSystemPrompt(listings),
+        system: buildSystemPrompt(listings, userTz),
         messages: history,
       },
       {
