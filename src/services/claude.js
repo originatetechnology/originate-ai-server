@@ -37,18 +37,12 @@ const axios = require('axios');
 const { getHistory, saveHistory } = require('../utils/history');
 const { getListings } = require('./configgo');
 
-function buildSystemPrompt(listings) {
+function buildSystemPrompt(listings, userTz = null) {
+  const tz = userTz?.tz || 'America/New_York';
+  const locale = userTz?.locale || 'en-US';
+  const tzName = userTz?.name || 'Eastern Time';
   const now = new Date();
-  const currentDateTime = now.toLocaleString('en-US', {
-    timeZone: 'America/New_York',
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-
+  const currentDateTime = formatDateInTz(now, tz, locale);
   const tomorrow = new Date(now);
   tomorrow.setDate(tomorrow.getDate() + 1);
   const dayAfter = new Date(now);
