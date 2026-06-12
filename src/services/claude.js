@@ -1,3 +1,14 @@
+// Rate limiter — max 10 messages per user per hour
+const messageCount = {};
+const RATE_LIMIT = parseInt(process.env.RATE_LIMIT_PER_HOUR) || 50;
+function isRateLimited(userId) {
+  const now = Date.now();
+  if (!messageCount[userId]) messageCount[userId] = [];
+  messageCount[userId] = messageCount[userId].filter(t => now - t < 3600000);
+  if (messageCount[userId].length >= RATE_LIMIT) return true;
+  messageCount[userId].push(now);
+  return false;
+}
 const { parsePhoneNumber } = require('libphonenumber-js');
 
 const TIMEZONE_MAP = {
@@ -68,7 +79,7 @@ TOMORROW: ${formatDate(tomorrow)}
 DAY AFTER TOMORROW: ${formatDate(dayAfter)}
 NEXT WEEK: ${formatDate(nextWeek)}
 
-CRITICAL SCHEDULING RULE: You must NEVER schedule appointments in the past. If someone requests a date or time that has already passed based on the current date and time above, politely tell them that time has passed and suggest the next available slots starting from tomorrow. Always suggest 2-3 specific future dates and times.
+CRITICAL SCHEDULING RULE: You must NEVER schedule appointments in the past. If someone requests a date or time that has already passed based on the current date and time above, politely tell them that time has passed and suggest the next available slots starting from tomorrow. Always suggest 2 specific future dates and times.
 
 PERSONALITY
 - Warm, professional, and concise
@@ -165,6 +176,10 @@ ${listingText}`;
 
 async function getAIReply(userId, userMessage, channel) {
   try {
+    if (isRateLimited(userId)) {
+      console.log(`[rate-limit] User ${userId} exceeded limit`);
+      return "Thanks for your message! Our team will be in touch shortly.";
+    }
     const listings = await getListings();
     const history = getHistory(userId);
 
