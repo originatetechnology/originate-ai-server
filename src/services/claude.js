@@ -180,6 +180,10 @@ async function getAIReply(userId, userMessage, channel) {
       console.log(`[rate-limit] User ${userId} exceeded limit`);
       return "Thanks for your message! Our team will be in touch shortly.";
     }
+    if (isRateLimited(userId)) {
+      console.log(`[rate-limit] User ${userId} exceeded limit`);
+      return "Thanks for your message! Our team will be in touch shortly.";
+    }
     const listings = await getListings();
     const history = getHistory(userId);
 
