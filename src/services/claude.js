@@ -195,7 +195,8 @@ async function getAIReply(userId, userMessage, channel) {
   try {
     if (isRateLimited(userId)) {
       console.log(`[rate-limit] User ${userId} exceeded limit`);
-      return "Thanks for your message! Our team will be in touch shortly.";
+      return "We've received a high volume of messages right now. Our team will follow up with you within the hour. If this is urgent please call us directly.";
+ 
     }
 
     const listings = await getListings();
