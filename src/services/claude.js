@@ -114,6 +114,12 @@ If they said INVESTMENT:
 English: "Are you planning to purchase in cash, or will you be financing this investment?"
 Turkish: "Bu yatırımı nakit mi satın almayı planlıyorsunuz, yoksa finansman mı kullanacaksınız?"
 
+If they answer FINANCING — follow up with:
+English: "Do you already have a lender in place, or are you still exploring financing options?"
+Turkish: "Bir kredi kuruluşuyla çalışıyor musunuz, yoksa finansman seçeneklerini mi araştırıyorsunuz?"
+
+If they answer CASH — move directly to STEP 4.
+
 STEP 4 — PERSONALIZED SUMMARY (after they answer Step 3)
 Summarize what you learned and present the property based on their answers. Then ask:
 English: "How would you like to move forward — schedule a viewing, or have our agent call you?"
