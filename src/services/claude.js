@@ -195,7 +195,18 @@ async function getAIReply(userId, userMessage, channel) {
   try {
     if (isRateLimited(userId)) {
       console.log(`[rate-limit] User ${userId} exceeded limit`);
-      return "We've received a high volume of messages right now. Our team will follow up with you within the hour. If this is urgent please call us directly.";
+      const userTzForLimit = userTz?.tz || 'America/New_York';
+      const userTzName = userTz?.name || 'Eastern Time';
+      const resetTime = new Date(Date.now() + 3600000).toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        timeZone: userTzForLimit
+      });
+      const turkishMessage = `Şu anda yoğun mesaj trafiği yaşıyoruz. Lütfen ${resetTime} (${userTzName}) saatinden sonra geri gelin. Sizi bekliyoruz! Acil bir durum için bizi doğrudan arayabilirsiniz: +1 (781) 658-8876.`;
+      const englishMessage = `We've received a high volume of messages right now. Please come back after ${resetTime} (${userTzName}) to continue our conversation. We look forward to speaking with you then! If this is urgent, please call us directly at +1 (781) 658-8876.`;
+      const isTurkish = /[çğışöüÇĞİŞÖÜ]/.test(userMessage) || /\b(merhaba|evet|hayır|tamam|teşekkür)\b/i.test(userMessage);
+      return isTurkish ? turkishMessage : englishMessage;
+ 
  
     }
 
