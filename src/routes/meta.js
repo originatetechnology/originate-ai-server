@@ -2,6 +2,92 @@ const express = require('express');
 const router = express.Router();
 const { getAIReply } = require('../services/claude');
 const { sendReply } = require('../services/reply');
+const { createClient } = require('@supabase/supabase-js');
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY
+);
+
+// Parse [LEAD_QUALIFIED] tag from Claude's reply
+function parseLeadTag(reply) {
+  const match = reply.match(/\[LEAD_QUALIFIED:\s*intent=([^\s]+)\s+timeline=([^\s]+)\s+status=([^\s]+)\s+action=([^\s]+)\s+ref=([^\]]+)\]/);
+  if (!match) return null;
+  return {
+    intent: match[1],
+    timeline: match[2],
+    status: match[3],
+    action: match[4],
+    ref: match[5],
+  };
+}
+
+// Save message to Supabase
+async function saveToSupabase(senderId, channel, userMessage, aiReply, leadData) {
+  try {
+    // Upsert contact
+    const { data: contact, error: contactError } = await supabase
+      .from('contacts')
+      .upsert(
+        { external_id: senderId, channel },
+        { onConflict: 'external_id,channel' }
+      )
+      .select()
+      .single();
+
+    if (contactError) throw contactError;
+
+    // Upsert conversation
+    const { data: conversation, error: convError } = await supabase
+      .from('conversations')
+      .upsert(
+        {
+          contact_id: contact.id,
+          channel,
+          last_message: aiReply.replace(/\[LEAD_QUALIFIED[^\]]*\]/g, '').trim(),
+          last_message_at: new Date().toISOString(),
+          status: leadData ? 'qualified' : 'open',
+        },
+        { onConflict: 'contact_id' }
+      )
+      .select()
+      .single();
+
+    if (convError) throw convError;
+
+    // Save user message
+    await supabase.from('messages').insert({
+      conversation_id: conversation.id,
+      contact_id: contact.id,
+      role: 'user',
+      content: userMessage,
+      channel,
+    });
+
+    // Save AI reply (strip the tag from stored message)
+    const cleanReply = aiReply.replace(/\[LEAD_QUALIFIED[^\]]*\]/g, '').trim();
+    await supabase.from('messages').insert({
+      conversation_id: conversation.id,
+      contact_id: contact.id,
+      role: 'assistant',
+      content: cleanReply,
+      channel,
+    });
+
+    // If lead qualified, save lead data
+    if (leadData) {
+      await supabase.from('contacts').update({
+        updated_at: new Date().toISOString(),
+      }).eq('id', contact.id);
+
+      console.log(`[supabase] Lead qualified — ref: ${leadData.ref} intent: ${leadData.intent} timeline: ${leadData.timeline}`);
+    }
+
+    console.log(`[supabase] Saved message for contact ${senderId}`);
+  } catch (err) {
+    console.error('[supabase] Save error:', err.message);
+  }
+}
 
 // Meta webhook verification
 router.get('/', (req, res) => {
@@ -35,7 +121,10 @@ router.post('/', async (req, res) => {
           const channel = body.object;
           console.log(`[${channel}] From ${senderId}: ${text}`);
           const reply = await getAIReply(senderId, text, channel);
-          await sendReply(channel, senderId, reply);
+          const leadData = parseLeadTag(reply);
+          if (leadData) console.log(`[lead] Qualified — ${JSON.stringify(leadData)}`);
+          await sendReply(channel, senderId, reply.replace(/\[LEAD_QUALIFIED[^\]]*\]/g, '').trim());
+          await saveToSupabase(senderId, channel, text, reply, leadData);
         }
       }
     }
@@ -50,7 +139,10 @@ router.post('/', async (req, res) => {
             const text = msg.text.body;
             console.log(`[whatsapp] From ${senderId}: ${text}`);
             const reply = await getAIReply(senderId, text, 'whatsapp');
-            await sendReply('whatsapp', senderId, reply);
+            const leadData = parseLeadTag(reply);
+            if (leadData) console.log(`[lead] Qualified — ${JSON.stringify(leadData)}`);
+            await sendReply('whatsapp', senderId, reply.replace(/\[LEAD_QUALIFIED[^\]]*\]/g, '').trim());
+            await saveToSupabase(senderId, 'whatsapp', text, reply, leadData);
           }
         }
       }
