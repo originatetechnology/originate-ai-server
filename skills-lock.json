@@ -1,0 +1,113 @@
+{
+  "version": 1,
+  "skills": {
+    "accessibility": {
+      "source": "thedesignproject/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/accessibility/SKILL.md",
+      "computedHash": "10e83284d3395ab5ec2f2db602b663480a37a4ff404d16510eefe86b034fcc1a"
+    },
+    "agentic-design-systems": {
+      "source": "thedesignproject/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/agentic-design-systems/SKILL.md",
+      "computedHash": "7d1a5b78ee1e56e1813418b8490fc1d4f79479e56253c06480d8ee297750c891"
+    },
+    "ai-component-metadata": {
+      "source": "thedesignproject/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/ai-component-metadata/SKILL.md",
+      "computedHash": "f1f0d51451a09b48d84eb250c9ee59efa655aa5e9f478df8b32b61e0a01e0fb6"
+    },
+    "business-kickoff-workshop": {
+      "source": "thedesignproject/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/business-kickoff-workshop/SKILL.md",
+      "computedHash": "f43bc7fd4931ccc86cfbaa46868935d2ef57d8d663c94b5656806346dad00afe"
+    },
+    "caveman": {
+      "source": "thedesignproject/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/caveman/SKILL.md",
+      "computedHash": "259cb6ef69b4e9eeb07155c925ce9895ed509b0feb6a7e29cbc9e70d3c7bcfb2"
+    },
+    "create-prd": {
+      "source": "thedesignproject/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/create-prd/SKILL.md",
+      "computedHash": "b1a694f1ea50f6d72be2fa60347f2c986258b8b77d77dd399804ea540c0a1622"
+    },
+    "create-skill": {
+      "source": "thedesignproject/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/create-skill/SKILL.md",
+      "computedHash": "8f566f4c738afc141d95762e1d8c58569443ec90da89e50f984c50f3b5c48c76"
+    },
+    "extract-design-system": {
+      "source": "thedesignproject/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/extract-design-system/SKILL.md",
+      "computedHash": "5f231fda377e304b202848f09ecc0fd42839355e76f60e06c3ceb7a643c15500"
+    },
+    "figma-generate-design": {
+      "source": "thedesignproject/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/figma-generate-design/SKILL.md",
+      "computedHash": "736613c1270855fb0043f5ffd56a9aa67eaefd0b570566e7ebe7ff1626aada68"
+    },
+    "figma-use": {
+      "source": "thedesignproject/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/figma-use/SKILL.md",
+      "computedHash": "e2ccd2ea5fe77bcdc2f7149ddc020b98e056c261cfd395a8d40cf0e2aee21a40"
+    },
+    "find-skills": {
+      "source": "thedesignproject/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/find-skills/SKILL.md",
+      "computedHash": "d31e234f0c90694a670222cdd1dafa853e051d7066beda389f1097c22dadd461"
+    },
+    "frontend-design": {
+      "source": "thedesignproject/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/frontend-design/SKILL.md",
+      "computedHash": "e8118284a6365753790d44bb2758a6032b3af27fa84696428d9233f2be0f4e78"
+    },
+    "marketing-psychology": {
+      "source": "thedesignproject/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/marketing-psychology/SKILL.md",
+      "computedHash": "ddec844d01d102687f89749e1d3a9f7a9019010dce1039a7d442189f39726ad4"
+    },
+    "pr-branch-naming": {
+      "source": "thedesignproject/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/pr-branch-naming/SKILL.md",
+      "computedHash": "368b786e0dd5de2475a638af865f6009acedd2423c27c025ced9a314335ff162"
+    },
+    "presentation": {
+      "source": "thedesignproject/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/presentation/SKILL.md",
+      "computedHash": "ee541927716a2d58546ceef5a2a3c02ea2a4562737e96e16cc2135156492a344"
+    },
+    "prompt-engineer": {
+      "source": "thedesignproject/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/prompt-engineer/SKILL.md",
+      "computedHash": "5e265f5769cda03ba152f51fb9502af6550a2c2c76b7bb44f45e7ff8db1cf53e"
+    },
+    "web-design-guidelines": {
+      "source": "thedesignproject/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-design-guidelines/SKILL.md",
+      "computedHash": "a6a44d5498f7e8f68289902f3dedfc6f38ae0cee1e96527c80724cf27f727c2a"
+    },
+    "writing-skills": {
+      "source": "thedesignproject/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/writing-skills/SKILL.md",
+      "computedHash": "c0a92e629e39ea91b1f54da67a6aa92723008a8ef5b500c6de078f55485937c7"
+    }
+  }
+}
